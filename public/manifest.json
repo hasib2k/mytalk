@@ -1,0 +1,31 @@
+{
+  "name": "MyTalk - Audio Conference",
+  "short_name": "MyTalk",
+  "description": "Premium audio conferencing for up to 2,500 participants",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e6e9f0",
+  "theme_color": "#e6e9f0",
+  "orientation": "any",
+  "categories": ["communication", "business"],
+  "icons": [
+    {
+      "src": "/icons/app-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/app-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/app-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
