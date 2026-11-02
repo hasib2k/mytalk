@@ -1,0 +1,13 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "live.appletalk.meet",
+      "sha256_cert_fingerprints": [
+        "95:05:B9:8F:84:04:60:9C:8D:73:74:ED:52:E4:E2:48:7C:06:76:8E:1E:31:82:D4:B7:73:BF:4D:43:76:D9:CC",
+        "B1:BB:3B:76:02:6D:05:AD:AD:74:62:6A:12:B6:3A:E1:D7:9B:C5:4D:7D:21:A4:3B:04:01:13:83:F7:80:9C:29"
+      ]
+    }
+  }
+]
