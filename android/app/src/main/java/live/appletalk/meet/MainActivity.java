@@ -1,5 +1,7 @@
 package live.appletalk.meet;
 
+import android.Manifest;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.PictureInPictureParams;
 import android.app.RemoteAction;
@@ -7,6 +9,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.drawable.Icon;
 import android.os.Build;
@@ -15,8 +18,11 @@ import android.util.Rational;
 import android.webkit.WebView;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.getcapacitor.BridgeActivity;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +41,41 @@ public class MainActivity extends BridgeActivity {
         // Register the web ↔ native PiP bridge before Capacitor loads the page.
         registerPlugin(PipPlugin.class);
         super.onCreate(savedInstanceState);
+
+        // Subscribe this device to the meeting-call broadcast topic.
+        FirebaseMessaging.getInstance().subscribeToTopic("meetings");
+
+        // Android 13+ needs an explicit notification permission for the calls.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+        }
+
+        handleCallIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleCallIntent(intent);
+    }
+
+    /** When the user answers an incoming-call notification, open the meeting. */
+    private void handleCallIntent(Intent intent) {
+        if (intent == null) return;
+        final String callUrl = intent.getStringExtra("callUrl");
+        if (callUrl == null || callUrl.isEmpty()) return;
+        // Clear the ringing notification.
+        NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (nm != null) nm.cancel(MyFirebaseMessagingService.CALL_NOTIFICATION_ID);
+        // Navigate the WebView to the meeting (auto-join). Post so the bridge/WebView
+        // is ready; a short delay lets Capacitor finish loading the start URL first.
+        final WebView wv = getBridge() != null ? getBridge().getWebView() : null;
+        if (wv != null) {
+            wv.postDelayed(() -> wv.loadUrl(callUrl), 300);
+        }
     }
 
     @Override

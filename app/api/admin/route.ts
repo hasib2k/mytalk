@@ -414,15 +414,24 @@ export async function POST(request: NextRequest) {
         // Signed host credential so the host link can grant host (and nobody
         // else can promote themselves via the URL).
         const hostToken = generateHostToken(roomName);
-        // Ring every subscribed device: "a meeting is starting — tap to join".
-        // Fire-and-forget so it never delays the admin response.
-        const origin = request.nextUrl.origin;
-        sendMeetingPush({
-          roomName,
-          title: typeof meetingTitle === 'string' ? meetingTitle : '',
-          url: `${origin}/rooms/${roomName}?autojoin=1`,
-        }).catch(() => {});
         return NextResponse.json({ success: true, message: 'Room created', roomName, hostToken });
+      }
+
+      case 'notify_room': {
+        // Admin "Notify all" — ring every subscribed device for THIS meeting.
+        let title = '';
+        try {
+          const rooms = await svc.listRooms([roomName]);
+          const meta = JSON.parse(rooms.find((r) => r.name === roomName)?.metadata || '{}');
+          title = typeof meta.title === 'string' ? meta.title : '';
+        } catch {}
+        const origin = request.nextUrl.origin;
+        await sendMeetingPush({
+          roomName,
+          title,
+          url: `${origin}/rooms/${roomName}?autojoin=1`,
+        });
+        return NextResponse.json({ success: true, message: 'Notification sent' });
       }
 
       case 'lower_hand': {

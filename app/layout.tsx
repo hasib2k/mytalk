@@ -7,7 +7,6 @@ import { AuthProvider } from '@/lib/AuthProvider';
 import { RegisterSW } from '@/lib/RegisterSW';
 import { PWAInstallPrompt } from '@/lib/PWAInstallPrompt';
 import { DeepLinkHandler } from '@/lib/DeepLinkHandler';
-import { PushNotifications } from '@/lib/PushNotifications';
 
 export const metadata: Metadata = {
   title: {
@@ -57,7 +56,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body data-lk-theme="default">
         <AuthProvider>
           <DeepLinkHandler />
-          <PushNotifications />
           <RegisterSW />
           <PWAInstallPrompt />
           <Toaster />

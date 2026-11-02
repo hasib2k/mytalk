@@ -51,6 +51,8 @@ function HomeContent() {
   const [bioInput, setBioInput] = useState('');
   // roomName -> true (live) | false (ended/gone). Undefined = not checked yet.
   const [activeMeetings, setActiveMeetings] = useState<Record<string, boolean>>({});
+  // Ongoing public meetings anyone can drop into.
+  const [liveMeetings, setLiveMeetings] = useState<Array<{ roomName: string; title: string; participantCount: number }>>([]);
 
   useEffect(() => {
     setHistory(getMeetingHistory());
@@ -82,6 +84,25 @@ function HomeContent() {
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [historyKey]);
+
+  // Poll ongoing public meetings so anyone can join a live call from the home page.
+  useEffect(() => {
+    let cancelled = false;
+    const load = () => {
+      fetch('/api/live-meetings')
+        .then((r) => r.json())
+        .then((data) => { if (!cancelled) setLiveMeetings(Array.isArray(data?.meetings) ? data.meetings : []); })
+        .catch(() => {});
+    };
+    load();
+    const iv = setInterval(load, 15000);
+    return () => { cancelled = true; clearInterval(iv); };
+  }, []);
+
+  const handleJoinLive = (roomName: string) => {
+    saveMeeting(roomName, 'listener');
+    router.push(`/rooms/${roomName}`);
+  };
 
   const persistBio = (text: string) => {
     const trimmed = text.trim();
@@ -277,6 +298,27 @@ function HomeContent() {
                     </button>
                   </div>
                   {joinError && <div className="join-error">{joinError}</div>}
+
+                  {/* Ongoing (live) meetings — anyone can join */}
+                  {liveMeetings.length > 0 && (
+                    <div className="dk-recent-section">
+                      <span className="dk-history-label">Live now</span>
+                      <div className="dk-history-list">
+                        {liveMeetings.map((m) => (
+                          <div key={m.roomName} className="dk-history-item">
+                            <div className="dk-history-icon">
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="3" fill="#16a34a" stroke="none"/><path d="M16.2 7.8a6 6 0 0 1 0 8.4M7.8 16.2a6 6 0 0 1 0-8.4"/></svg>
+                            </div>
+                            <div className="dk-history-info">
+                              <span className="dk-history-name">{m.title || m.roomName}</span>
+                              <span className="dk-history-meta">{m.participantCount} in call &middot; {m.roomName}</span>
+                            </div>
+                            <button className="dk-history-rejoin" onClick={() => handleJoinLive(m.roomName)}>Join</button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Recent Meetings */}
                   <div className="dk-recent-section">
@@ -584,6 +626,27 @@ function HomeContent() {
                 </div>
                 {joinError && <div className="join-error">{joinError}</div>}
               </div>
+
+              {/* Ongoing (live) meetings — anyone can join */}
+              {liveMeetings.length > 0 && (
+                <div className="m-recent-section">
+                  <div className="m-join-label">Live now</div>
+                  <div className="meeting-history-list">
+                    {liveMeetings.map((m) => (
+                      <div key={m.roomName} className="meeting-history-item">
+                        <div className="meeting-history-icon">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="3" fill="#16a34a" stroke="none"/><path d="M16.2 7.8a6 6 0 0 1 0 8.4M7.8 16.2a6 6 0 0 1 0-8.4"/></svg>
+                        </div>
+                        <div className="meeting-history-info">
+                          <span className="meeting-history-name">{m.title || m.roomName}</span>
+                          <span className="meeting-history-meta">{m.participantCount} in call &middot; {m.roomName}</span>
+                        </div>
+                        <button className="meeting-history-rejoin" onClick={() => handleJoinLive(m.roomName)}>Join</button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Recent Meetings */}
               <div className="m-recent-section">

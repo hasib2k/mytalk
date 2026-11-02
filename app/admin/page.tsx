@@ -111,6 +111,7 @@ const P = {
   globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
   link: '<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
   wait: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',
+  bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
 };
 
 function Svg({ d, color = 'currentColor', size = 20, sw = 2 }: { d: string; color?: string; size?: number; sw?: number }) {
@@ -702,6 +703,7 @@ function SelectedMeeting({ sel, meta, now, query, setQuery, filter, setFilter, p
     meta.locked
       ? { label: 'Unlock', color: '#d98a12', icon: P.unlock, onClick: () => post({ action: 'lock_room', roomName, locked: false }) }
       : { label: 'Lock', color: '#d98a12', icon: P.lock, onClick: () => post({ action: 'lock_room', roomName, locked: true }) },
+    { label: 'Notify all', color: '#16a34a', icon: P.bell, onClick: () => post({ action: 'notify_room', roomName }, 'Call sent to everyone') },
     { label: 'Mute all', color: '#1f2440', icon: P.off, onClick: () => post({ action: 'mute_all', roomName }, 'Everyone muted') },
     { label: 'Unmute all', color: '#1f2440', icon: P.mic, onClick: () => post({ action: 'unmute_all', roomName }, 'Speakers unmuted') },
     { label: 'Copy link', color: '#3f6fe0', icon: P.link, onClick: () => { try { navigator.clipboard.writeText(`${window.location.origin}/rooms/${roomName}`); } catch {} flash('Link copied'); } },

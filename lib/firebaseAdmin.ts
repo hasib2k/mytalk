@@ -24,38 +24,25 @@ function ensureApp(): App | null {
 
 const MEETINGS_TOPIC = 'meetings';
 
-/** Subscribe a device's FCM token to the broadcast topic for new meetings. */
-export async function subscribeTokenToMeetings(token: string): Promise<boolean> {
-  const app = ensureApp();
-  if (!app || !token) return false;
-  try {
-    await getMessaging(app).subscribeToTopic([token], MEETINGS_TOPIC);
-    return true;
-  } catch (e) {
-    console.error('subscribeToTopic failed:', e);
-    return false;
-  }
-}
-
-/** Fan a "new meeting" notification out to every subscribed device. */
+/**
+ * Ring every subscribed device with an incoming-call notification. Sent as a
+ * DATA-ONLY message (no `notification` block) so the native
+ * MyFirebaseMessagingService handles it in every app state and renders a full
+ * CallStyle incoming-call UI (ringtone + Answer/Decline).
+ */
 export async function sendMeetingPush(opts: { roomName: string; title: string; url: string }): Promise<void> {
   const app = ensureApp();
   if (!app) return;
-  const body = opts.title ? `${opts.title} — tap to join` : 'Tap to join';
   try {
     await getMessaging(app).send({
       topic: MEETINGS_TOPIC,
-      notification: { title: 'New meeting starting', body },
-      data: { roomName: opts.roomName, url: opts.url },
-      android: {
-        priority: 'high',
-        notification: {
-          channelId: 'meetings',
-          priority: 'max',
-          sound: 'default',
-          defaultSound: true,
-        },
+      data: {
+        type: 'incoming_call',
+        roomName: opts.roomName,
+        title: opts.title || '',
+        url: opts.url,
       },
+      android: { priority: 'high' },
     });
   } catch (e) {
     console.error('sendMeetingPush failed:', e);
