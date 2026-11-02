@@ -4,6 +4,8 @@ import React, { useState, useCallback } from 'react';
 import { LocalUserChoices } from '@livekit/components-react';
 import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useIsNativeApp } from '@/lib/platform';
+import { nativeGoogleSignIn } from '@/lib/nativeGoogleAuth';
 
 export function AudioOnlyPreJoin(props: {
   onSubmit: (choices: LocalUserChoices & { imageUrl?: string }) => void;
@@ -12,6 +14,8 @@ export function AudioOnlyPreJoin(props: {
 }) {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const isNativeApp = useIsNativeApp();
+  const [nativeBusy, setNativeBusy] = useState(false);
   const [guestName, setGuestName] = useState('');
   const [bio, setBio] = useState('');
 
@@ -84,6 +88,24 @@ export function AudioOnlyPreJoin(props: {
       bio: bio.trim(),
     } as any);
   }, [guestName, bio, props.onSubmit]);
+
+  // Google button handler. In the native app the web OAuth redirect can't work
+  // (Google blocks embedded WebViews), so we run native Google Sign-In; on
+  // success the session updates and the effect above switches to 'google' mode.
+  const handleGoogleClick = useCallback(async () => {
+    if (isLoggedIn) { setMode('google'); return; }
+    if (isNativeApp) {
+      setNativeBusy(true);
+      const r = await nativeGoogleSignIn();
+      setNativeBusy(false);
+      if (!r.ok) alert(`Google sign-in failed.${r.error ? ' ' + r.error : ''}`);
+      return;
+    }
+    // Remember the full join URL (role + host key) so we can restore the host
+    // role and auto-join after Google sends us back.
+    try { sessionStorage.setItem('pending_google_join', window.location.href); } catch {}
+    signIn('google', { callbackUrl: window.location.href });
+  }, [isLoggedIn, isNativeApp]);
 
   const roleLabel = props.role === 'host' ? 'Host' : props.role === 'moderator' ? 'Moderator' : 'Listener';
 
@@ -308,19 +330,11 @@ export function AudioOnlyPreJoin(props: {
           </div>
         </div>
 
-        {/* Google sign in */}
+        {/* Google sign in — native picker in the app, web OAuth in the browser */}
         <button
           className="prejoin-auth-btn"
-          onClick={() => {
-            if (isLoggedIn) {
-              setMode('google');
-            } else {
-              // Remember the full join URL (role + host key) so we can restore
-              // the host role and auto-join after Google sends us back.
-              try { sessionStorage.setItem('pending_google_join', window.location.href); } catch {}
-              signIn('google', { callbackUrl: window.location.href });
-            }
-          }}
+          onClick={handleGoogleClick}
+          disabled={nativeBusy}
         >
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
@@ -328,7 +342,7 @@ export function AudioOnlyPreJoin(props: {
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
           </svg>
-          Continue with Google
+          {nativeBusy ? 'Signing in…' : 'Continue with Google'}
         </button>
 
         {/* Divider */}

@@ -15,11 +15,13 @@
   "dependencies": {
     "@capacitor/android": "^8.6.0",
     "@capacitor/core": "^8.6.0",
+    "@capgo/capacitor-social-login": "^8.7.5",
     "@datadog/browser-logs": "^5.23.3",
     "@livekit/components-react": "2.9.24",
     "@livekit/components-styles": "1.2.0",
     "@livekit/krisp-noise-filter": "0.4.4",
     "@livekit/track-processors": "^0.8.0",
+    "google-auth-library": "^11.3.2",
     "livekit-client": "2.22.4",
     "livekit-server-sdk": "2.19.1",
     "next": "15.5.28",

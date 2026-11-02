@@ -3,6 +3,19 @@ apply plugin: 'com.android.application'
 android {
     namespace = "live.appletalk.meet"
     compileSdk = rootProject.ext.compileSdkVersion
+    signingConfigs {
+        release {
+            def kpFile = rootProject.file('keystore.properties')
+            if (kpFile.exists()) {
+                def kp = new Properties()
+                kp.load(new FileInputStream(kpFile))
+                storeFile rootProject.file(kp['storeFile'])
+                storePassword kp['storePassword']
+                keyAlias kp['keyAlias']
+                keyPassword kp['keyPassword']
+            }
+        }
+    }
     defaultConfig {
         applicationId "live.appletalk.meet"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -20,6 +33,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
 }
