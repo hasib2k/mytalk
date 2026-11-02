@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">MyTalk</string>
+    <string name="title_activity_main">MyTalk</string>
+    <string name="package_name">live.appletalk.meet</string>
+    <string name="custom_url_scheme">live.appletalk.meet</string>
+</resources>
