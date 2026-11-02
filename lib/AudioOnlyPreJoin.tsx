@@ -89,6 +89,35 @@ export function AudioOnlyPreJoin(props: {
     } as any);
   }, [guestName, bio, props.onSubmit]);
 
+  // Auto-join from a meeting-call notification (?autojoin=1): skip the chooser and
+  // join straight away — as the Google user if signed in, else with a saved guest
+  // name. If there's no identity yet, fall through to the normal chooser.
+  const autoJoinAttempted = React.useRef(false);
+  React.useEffect(() => {
+    if (autoJoinAttempted.current || status === 'loading') return;
+    let wantsAutoJoin = false;
+    try { wantsAutoJoin = new URLSearchParams(window.location.search).get('autojoin') === '1'; } catch {}
+    if (!wantsAutoJoin) return;
+    if (isLoggedIn && userName) {
+      autoJoinAttempted.current = true;
+      handleGoogleJoin();
+      return;
+    }
+    let savedGuest = '';
+    try { savedGuest = localStorage.getItem('guestName') || ''; } catch {}
+    if (savedGuest.trim()) {
+      autoJoinAttempted.current = true;
+      props.onSubmit({
+        username: savedGuest.trim(),
+        videoEnabled: false,
+        audioEnabled: true,
+        videoDeviceId: '',
+        audioDeviceId: '',
+        bio: bio.trim(),
+      } as any);
+    }
+  }, [status, isLoggedIn, userName, handleGoogleJoin, bio, props.onSubmit]);
+
   // Google button handler. In the native app the web OAuth redirect can't work
   // (Google blocks embedded WebViews), so we run native Google Sign-In; on
   // success the session updates and the effect above switches to 'google' mode.

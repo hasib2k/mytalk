@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { RoomServiceClient } from 'livekit-server-sdk';
 import { verifyAdminToken, generateHostToken } from '@/lib/adminAuth';
 import { validateRoomName } from '@/lib/validation';
+import { sendMeetingPush } from '@/lib/firebaseAdmin';
 
 const API_KEY = process.env.LIVEKIT_API_KEY!;
 const API_SECRET = process.env.LIVEKIT_API_SECRET!;
@@ -413,6 +414,14 @@ export async function POST(request: NextRequest) {
         // Signed host credential so the host link can grant host (and nobody
         // else can promote themselves via the URL).
         const hostToken = generateHostToken(roomName);
+        // Ring every subscribed device: "a meeting is starting — tap to join".
+        // Fire-and-forget so it never delays the admin response.
+        const origin = request.nextUrl.origin;
+        sendMeetingPush({
+          roomName,
+          title: typeof meetingTitle === 'string' ? meetingTitle : '',
+          url: `${origin}/rooms/${roomName}?autojoin=1`,
+        }).catch(() => {});
         return NextResponse.json({ success: true, message: 'Room created', roomName, hostToken });
       }
 

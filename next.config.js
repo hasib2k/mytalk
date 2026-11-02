@@ -2,6 +2,8 @@
 const nextConfig = {
   reactStrictMode: false,
   productionBrowserSourceMaps: false,
+  // firebase-admin is a server-only Node package — don't bundle it.
+  serverExternalPackages: ['firebase-admin'],
   images: {
     formats: ['image/webp'],
   },
