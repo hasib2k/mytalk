@@ -6515,3 +6515,65 @@ select:-webkit-autofill {
 .knock-deny:hover { filter: brightness(1.1); }
 .knock-admit:active,
 .knock-deny:active { transform: translateY(1px); box-shadow: inset 3px 3px 6px #c3c8d4, inset -3px -3px 6px #ffffff; }
+
+/* ======================================================================
+   Native Android Picture-in-Picture — clean participant grid only
+   Toggled by lib/NativePipController via the `pip-active` class on <html>.
+   Everything except the participant grid is hidden so the small floating
+   window shows a tidy 2/4-tile grid; mic/end/open live in native buttons.
+   ====================================================================== */
+html.pip-active,
+html.pip-active body {
+  background: #e6e9f0 !important;
+  overflow: hidden !important;
+}
+
+/* Hide all meeting chrome (title bar, control bar, chat, side panels, floating
+   buttons, toasts) — keep only the participant grid wrapper. */
+html.pip-active .lk-room-container > *:not(.lk-video-conference),
+html.pip-active .lk-video-conference > *:not(.lk-video-conference-inner),
+html.pip-active .lk-video-conference-inner > *:not(.lk-grid-layout-wrapper):not(.lk-focus-layout-wrapper) {
+  display: none !important;
+}
+
+/* Make the grid fill the entire PiP window. */
+html.pip-active .lk-room-container,
+html.pip-active .lk-video-conference,
+html.pip-active .lk-video-conference-inner,
+html.pip-active .lk-grid-layout-wrapper,
+html.pip-active .lk-focus-layout-wrapper {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+html.pip-active .lk-grid-layout {
+  display: grid !important;
+  height: 100% !important;
+  width: 100% !important;
+  gap: 3px !important;
+  padding: 3px !important;
+  box-sizing: border-box !important;
+}
+
+/* Strip per-tile clutter so the tiny tiles stay clean (avatars still show). */
+html.pip-active .lk-participant-metadata,
+html.pip-active .tile-bio-text,
+html.pip-active .tile-three-dot-btn,
+html.pip-active .hand-raised-indicator,
+html.pip-active .mic-unmuted-indicator,
+html.pip-active .lk-focus-toggle-button,
+html.pip-active .lk-participant-tile .lk-button {
+  display: none !important;
+}
+
+html.pip-active .lk-participant-tile {
+  border-radius: 8px !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+}
