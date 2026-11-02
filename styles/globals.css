@@ -6553,15 +6553,32 @@ html.pip-active .lk-focus-layout-wrapper {
 
 html.pip-active .lk-grid-layout {
   display: grid !important;
+  /* auto-fit: 1 participant fills the window, 2 sit side by side, 3-4 become 2x2 */
+  grid-template-columns: repeat(auto-fit, minmax(45%, 1fr)) !important;
+  grid-auto-rows: 1fr !important;
+  align-content: stretch !important;
   height: 100% !important;
   width: 100% !important;
-  gap: 3px !important;
-  padding: 3px !important;
+  gap: 4px !important;
+  padding: 4px !important;
+  margin: 0 !important;
+  overflow: hidden !important;
   box-sizing: border-box !important;
 }
 
-/* Strip per-tile clutter so the tiny tiles stay clean (avatars still show). */
-html.pip-active .lk-participant-metadata,
+/* Tiles fill their grid cell — drop the fixed 168px mobile tile height. */
+html.pip-active .lk-participant-tile {
+  width: auto !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  margin: 0 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+/* Keep avatar + name; drop only the interactive clutter. */
 html.pip-active .tile-bio-text,
 html.pip-active .tile-three-dot-btn,
 html.pip-active .hand-raised-indicator,
@@ -6569,11 +6586,4 @@ html.pip-active .mic-unmuted-indicator,
 html.pip-active .lk-focus-toggle-button,
 html.pip-active .lk-participant-tile .lk-button {
   display: none !important;
-}
-
-html.pip-active .lk-participant-tile {
-  border-radius: 8px !important;
-  overflow: hidden !important;
-  min-width: 0 !important;
-  min-height: 0 !important;
 }
