@@ -26,9 +26,13 @@ export async function nativeGoogleSignIn(): Promise<{ ok: boolean; error?: strin
       await SocialLogin.initialize({ google: { webClientId } });
       initialized = true;
     }
+    // No `scopes` here on purpose: requesting Google API scopes triggers the
+    // AuthorizationClient (access-token) path, which needs MainActivity changes.
+    // We only need authentication — the Google ID token already carries the
+    // email/profile claims via Credential Manager.
     const res = await SocialLogin.login({
       provider: 'google',
-      options: { scopes: ['profile', 'email'] },
+      options: {},
     });
     const result = res?.result as { idToken?: string | null } | undefined;
     const idToken = result?.idToken;
