@@ -6344,6 +6344,37 @@ select:-webkit-autofill {
   box-shadow: inset 2px 2px 5px #cdd2de, inset -2px -2px 5px #eef1f7;
 }
 
+/* Rejoin stays inert until /api/room-info confirms the room is still live,
+   so an already-ended meeting can't be joined during the check window.
+   Declared after the layout blocks above so :disabled wins over the
+   base .class rules inside the responsive media queries. */
+.dk-history-rejoin:disabled,
+.dk-recent-rejoin:disabled,
+.meeting-history-rejoin:disabled,
+.mobile-recent-rejoin:disabled {
+  cursor: default;
+  color: #9aa0b8;
+  box-shadow: inset 2px 2px 5px #cdd2de, inset -2px -2px 5px #eef1f7;
+}
+.dk-history-rejoin:disabled:hover,
+.dk-recent-rejoin:disabled:hover,
+.meeting-history-rejoin:disabled:hover,
+.mobile-recent-rejoin:disabled:hover,
+.dk-history-rejoin:disabled:active,
+.dk-recent-rejoin:disabled:active,
+.meeting-history-rejoin:disabled:active,
+.mobile-recent-rejoin:disabled:active {
+  box-shadow: inset 2px 2px 5px #cdd2de, inset -2px -2px 5px #eef1f7;
+}
+
+/* Same hold for the mobile history timeline card, which is clickable as a whole */
+.hist-card.is-checking {
+  cursor: default;
+}
+.hist-card.is-checking:active {
+  box-shadow: 6px 6px 12px #cdd2de, -5px -5px 11px #eef1f7;
+}
+
 /* Join-with-code validation error */
 .join-error {
   margin-top: 10px;
