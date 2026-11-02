@@ -10,6 +10,14 @@ const config: CapacitorConfig = {
     url: 'https://meet.appletalk.live',
     cleartext: false,
   },
+  plugins: {
+    // Resize the WebView when the keyboard opens so content viewports shrink and
+    // every input screen becomes scrollable (browser's interactiveWidget meta has
+    // no effect inside the native WebView).
+    Keyboard: {
+      resize: 'native',
+    },
+  },
 };
 
 export default config;

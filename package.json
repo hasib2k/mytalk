@@ -16,6 +16,7 @@
     "@capacitor/android": "^8.6.0",
     "@capacitor/app": "^8.1.2",
     "@capacitor/core": "^8.6.0",
+    "@capacitor/keyboard": "^8.0.6",
     "@capgo/capacitor-social-login": "^8.7.5",
     "@datadog/browser-logs": "^5.23.3",
     "@livekit/components-react": "2.9.24",

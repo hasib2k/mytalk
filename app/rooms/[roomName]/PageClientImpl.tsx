@@ -33,6 +33,7 @@ import { HostLeaveButton } from '@/lib/HostLeaveButton';
 import { KnockRequests } from '@/lib/KnockRequests';
 import { KnockProvider } from '@/lib/KnockContext';
 import { MeetingPip } from '@/lib/MeetingPip';
+import { NativePipController } from '@/lib/NativePipController';
 
 const CONN_DETAILS_ENDPOINT =
   process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT ?? '/api/connection-details';
@@ -590,6 +591,7 @@ function AudioConferenceComponent(props: {
           <HostLeaveButton />
           <KnockRequests />
           <MeetingPip />
+          <NativePipController />
           <AdminTokenWatcher />
           <ParticipantsSidebar />
           <ParticipantProfileImages />
