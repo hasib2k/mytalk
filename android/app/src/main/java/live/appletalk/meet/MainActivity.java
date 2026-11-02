@@ -27,7 +27,7 @@ public class MainActivity extends BridgeActivity {
     private BroadcastReceiver pipReceiver;
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         if (pipReceiver == null) {
             pipReceiver = new BroadcastReceiver() {
@@ -56,7 +56,7 @@ public class MainActivity extends BridgeActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         if (pipReceiver != null) {
             try { unregisterReceiver(pipReceiver); } catch (Exception ignored) {}
             pipReceiver = null;
