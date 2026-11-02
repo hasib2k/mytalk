@@ -40,3 +40,6 @@ yarn-error.log*
 # Android release signing (NEVER commit)
 mytalk-release.keystore
 android/keystore.properties
+
+# Firebase app config (contains API key; placed locally for the APK build)
+android/app/google-services.json
